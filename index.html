@@ -3,9 +3,11 @@
 	<head>
 				<title>Countdown</title>
 				<script defer src="javascript/index.js" charset="utf-8"></script>
+				<script defer src="resources/stomp.min.js" charset="utf-8"></script>
 	</head>
 	<body>
 		<h1>Welcome to Countdown</h1>
-		<button id="startGameButton" onclick="searchForGame()">Start Game</button>
+		<button id="startGameButton" onclick="connect()">Start Game</button>
+		<button id="sendButton" onclick="send()">Start Game</button>
 	</body>
 </html>
