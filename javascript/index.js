@@ -1,44 +1,83 @@
-var ws;
+var countdown = 30;
+var letters = "";
 
-function searchForGame() {	
-	gameId = 101
-	letters = "teiroadnce"
-	
-	location.href = 'game.html?gameId=' + gameId + "&letters=" + letters;
-}
+const socket = new WebSocket('wss://p00743q402.execute-api.eu-west-2.amazonaws.com/production')
 
-function connect() {
-	var socket = new WebSocket('ws://localhost:8080/greeting');
-	ws = Stomp.over(socket);
+socket.addEventListener('open', e => {
+  console.log('WebSocket is connected')
+})
 
-	ws.connect({}, function(frame) {
-		ws.subscribe("/user/queue/errors", function(message) {
-			alert("Error " + message.body);
-		});
+socket.addEventListener('close', e => console.log('WebSocket is closed'))
 
-		ws.subscribe("/topic/user", function(message) {
-			showGreeting(message.body);
-		});
-	}, function(error) {
-		alert("STOMP error " + error);
-	});
-}
+socket.addEventListener('error', e => console.error('WebSocket is in error', e))
 
-function disconnect() {
-    if (ws != null) {
-        ws.close();
+socket.addEventListener('message', e => {
+  console.log(e)
+
+  const action = JSON.parse(e.data).action
+  console.log(action)
+  switch(action) {
+    case 'created':
+      created_game(e)
+      break;
+    case 'started':
+      started_game(e)
+      break;
+    case 'ended':
+      ended_game(e)
+      break
+  }
+})
+
+
+function searchForGame() {
+    const payload = {
+      action: 'search'
     }
-    setConnected(false);
-    console.log("Disconnected");
+    socket.send(JSON.stringify(payload))
 }
 
-function send() {
-	var data = JSON.stringify({
-		'playerId' : 999
-	})
-	ws.send("/app/playerQueue", {}, data);
+function startTimer() {
+    var x = setInterval(function () {
+        countdown--;
+
+        var elemTimer = document.getElementById('timer');
+        elemTimer.innerHTML = countdown;
+
+        if (countdown == 0) {
+            clearInterval(x)
+        }
+    }, 1000);
 }
 
-function showGreeting(message) {
-	console.log(message);
+function created_game(e) {
+  const opp = JSON.parse(e.data).opponent
+  letters = JSON.parse(e.data).letters
+
+  console.log('Opponent:', opp)
+  var oppEl = document.getElementById('opponent');
+  oppEl.innerText = 'Opponent: ' + opp
+}
+
+function started_game(e) {
+  var lettersEl = document.getElementById('letters');
+  lettersEl.innerText = letters
+
+  startTimer()
+}
+
+function ended_game(e) {
+    console.log('Ending game')
+    const answer = document.getElementById("answer").value
+    const gameId = JSON.parse(e.data).gameId
+    sendResult(gameId, answer)
+}
+
+function sendResult(gameId, answer) {
+    const payload = {
+      action: 'results',
+      answer: answer,
+      gameId: gameId
+    }
+    socket.send(JSON.stringify(payload))
 }

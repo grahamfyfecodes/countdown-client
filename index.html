@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
 	<head>
-				<title>Countdown</title>
-				<script defer src="javascript/index.js" charset="utf-8"></script>
-				<script defer src="resources/stomp.min.js" charset="utf-8"></script>
+		<title>Countdown</title>
+		<script defer src="javascript/index.js" charset="utf-8"></script>
+		<link rel="stylesheet" href="style/index.css">
 	</head>
 	<body>
 		<h1>Welcome to Countdown</h1>
-		<button id="startGameButton" onclick="connect()">Start Game</button>
-		<button id="sendButton" onclick="send()">Start Game</button>
+		<button id="gameSearchButton" onclick="searchForGame()">Search for Game</button>
+		<h1 id=letters>*********</h1>
+		<input type="text" id="answer"><br><br>
+		<h1 id=timer>30</h1>
+		<p id="opponent">Opponent: </p>
 	</body>
 </html>
